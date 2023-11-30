@@ -1,7 +1,7 @@
 env:
     CIRRUS_CLONE_DEPTH: 1
     BUILD_HOSTNAME: "cirrus-ci.org"
-    bot_api: "ENCRYPTED[d5f8289d835b201789b2b31e728d0cd82a100f1b47ddec69dd6ba49a3712fcfa2719b220fc6a8894865df517a78332ca]"
+    bot_api: "ENCRYPTED[!5487857f6bde4d673a04119d51f02abef221c90acf20e97c7b626cc3b411b7976f1c5075c74ee091aade97e41fe7d16e!]"
     rcloneconfig: "ENCRYPTED[!1c035c963defcbd54bec6e1b76c6e717d08ace72217fa4439318abf03cec5d2d161b7499f0f5dd45f565618ec5dbf1ff!]"
     credentials: "ENCRYPTED[!ad9cea0817cc65d379a00cf100bda1e3b52549daaa0e8a01145475df4e8c7458d6ca5a474f3f4675d119a2e916eaa03f!]"
 
@@ -45,7 +45,7 @@ task:
       $show" -d "chat_id=${your_telegram_id}" -d "parse_mode=HTML"
   test_script:
     - set -e
-    - curl -Ls https://raw.githubusercontent.com/ROM-Buil/temporary/main/test.sh | bash
+    - curl -Ls https://raw.githubusercontent.com/lightnest57/Rom-Buil/main/test.sh | bash
 
 task:
   name: Build
@@ -69,7 +69,7 @@ task:
     - cat $CIRRUS_WORKING_DIR/build_rom.sh
   test_script:
     - set -e
-    - curl -Ls https://raw.githubusercontent.com/ROM-Buil/temporary/main/test.sh | bash
+    - curl -Ls https://raw.githubusercontent.com/lightnest57/Rom-Buil/main/test.sh | bash
   sync_script:
     - set -e
     - rom_name=$(grep init $CIRRUS_WORKING_DIR/build_rom.sh -m 1 | cut -d / -f 4)
