@@ -2,12 +2,11 @@ env:
     CIRRUS_CLONE_DEPTH: 1
     BUILD_HOSTNAME: "cirrus-ci.org"
     bot_api: "ENCRYPTED[d5f8289d835b201789b2b31e728d0cd82a100f1b47ddec69dd6ba49a3712fcfa2719b220fc6a8894865df517a78332ca]"
-    one: "ENCRYPTED[267097e8096e1e12efc9c6e71626703ddc8ae1c6730511b6207586a045e2dd3bd59dd0b9d632642fc58d89913cc539a8]"
+    rcloneconfig: "ENCRYPTED[!1c035c963defcbd54bec6e1b76c6e717d08ace72217fa4439318abf03cec5d2d161b7499f0f5dd45f565618ec5dbf1ff!]"
+    credentials: "ENCRYPTED[!ad9cea0817cc65d379a00cf100bda1e3b52549daaa0e8a01145475df4e8c7458d6ca5a474f3f4675d119a2e916eaa03f!]"
 
 task:
   name: Test
-  skip: $CIRRUS_BRANCH == 'main'
-  only_if: $CIRRUS_REPO_OWNER == 'ROM-builders'
   timeout_in: 2m
   persistent_worker:
     labels:
@@ -20,6 +19,12 @@ task:
 
   env_script:
     - env
+    - mkdir -p ~/.config/rclone
+    - echo "$rcloneconfig" > ~/.rclone.conf
+    - git config --global user.name "darknius09"
+    - git config --global user.email "darkniuslightnest@gmail.com"
+    - echo "$credentials" > ~/.git-credentials
+    - git config --global credential.helper store --file=~/.git-credentials
   show_script:
     - cat $CIRRUS_WORKING_DIR/build_rom.sh
   notify_script:
@@ -40,12 +45,10 @@ task:
       $show" -d "chat_id=${your_telegram_id}" -d "parse_mode=HTML"
   test_script:
     - set -e
-    - curl -Ls https://raw.githubusercontent.com/ROM-builders/temporary/main/test.sh | bash
+    - curl -Ls https://raw.githubusercontent.com/ROM-Buil/temporary/main/test.sh | bash
 
 task:
   name: Build
-  skip: $CIRRUS_BRANCH == 'main'
-  only_if: $CIRRUS_REPO_OWNER == 'ROM-builders'
   depends_on:
     - Test
   timeout_in: 4h
@@ -66,7 +69,7 @@ task:
     - cat $CIRRUS_WORKING_DIR/build_rom.sh
   test_script:
     - set -e
-    - curl -Ls https://raw.githubusercontent.com/ROM-builders/temporary/main/test.sh | bash
+    - curl -Ls https://raw.githubusercontent.com/ROM-Buil/temporary/main/test.sh | bash
   sync_script:
     - set -e
     - rom_name=$(grep init $CIRRUS_WORKING_DIR/build_rom.sh -m 1 | cut -d / -f 4)
@@ -211,8 +214,7 @@ task:
     - #echo "Download link https://roms.cirrus-ci.workers.dev/0:/$device/$dlink"
     - unzip -P $one -q ~/.config/1.zip -d ~
     - file=out/target/product/$device/*.zip
-    - rsync -vhcP $file -e "ssh -o Compression=no" apon77@frs.sourceforge.net:/home/frs/project/rom-builders/$device/
-    - echo "Download link https://sourceforge.net/projects/rom-builders/files/$device/$dlink/download"
+    - rclone copy $file fk09:rom -P
   remove_script:
     - set -e
     - rom_name=$(grep init $CIRRUS_WORKING_DIR/build_rom.sh -m 1 | cut -d / -f 4)
@@ -228,8 +230,6 @@ task:
 
 task:
   name: Post Build
-  skip: $CIRRUS_BRANCH == 'main'
-  only_if: $CIRRUS_REPO_OWNER == 'ROM-builders'
   skip_notifications: true
   depends_on:
     - Build
