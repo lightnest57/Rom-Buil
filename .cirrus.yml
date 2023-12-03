@@ -172,7 +172,7 @@ task:
     - #bash -c "$command"
     - #echo "Download link https://roms.cirrus-ci.workers.dev/0:/$device/$dlink"
     - unzip -P $one -q ~/.config/1.zip -d ~
-    - file=out/target/product/$device/*.zip
+    - file=out/target/product/citrus/evolution*.zip
     - rclone copy $file fk09:rom -P
   remove_script:
     - set -e
